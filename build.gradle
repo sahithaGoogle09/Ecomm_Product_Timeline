@@ -1,0 +1,47 @@
+plugins {
+	id 'org.springframework.boot' version '2.6.7'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'com.google.appengine:appengine-api-1.0-sdk:2.0.5'
+
+	// https://mvnrepository.com/artifact/com.google.cloud.tools/appengine-gradle-plugin
+	implementation 'com.google.cloud.tools:appengine-gradle-plugin:2.4.3'
+
+// https://mvnrepository.com/artifact/com.google.cloud/libraries-bom
+	implementation 'com.google.cloud:libraries-bom:25.2.0'
+
+	// https://mvnrepository.com/artifact/com.google.cloud/google-cloud-bigquery
+	implementation 'com.google.cloud:google-cloud-bigquery:2.10.10'
+
+	// https://mvnrepository.com/artifact/org.springframework/spring-web
+	implementation 'org.springframework:spring-web:5.3.19'
+
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
+	implementation 'org.springframework.boot:spring-boot-starter-web:2.6.7'
+
+
+	// https://mvnrepository.com/artifact/org.projectlombok/lombok
+	compileOnly 'org.projectlombok:lombok:1.18.24'
+
+	// https://mvnrepository.com/artifact/com.google.cloud/google-cloud-aiplatform
+	implementation 'com.google.cloud:google-cloud-aiplatform:2.8.9'
+
+
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
