@@ -1,6 +1,15 @@
 package com.example.demo.model;
 
 public class ProductInfoVO {
+    public Integer getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Integer productId) {
+        this.productId = productId;
+    }
+
+    private Integer productId;
     private String productName;
     private String productImage;
     private double productPrice;
@@ -8,6 +17,16 @@ public class ProductInfoVO {
     private Integer likelyToBeSoldDays;
 
     private String priorityToRestock;
+
+    private Boolean outOfStock;
+
+    public Boolean getOutOfStock() {
+        return outOfStock;
+    }
+
+    public void setOutOfStock(Boolean outOfStock) {
+        this.outOfStock = outOfStock;
+    }
 
     public String getPriorityToRestock() {
         return priorityToRestock;

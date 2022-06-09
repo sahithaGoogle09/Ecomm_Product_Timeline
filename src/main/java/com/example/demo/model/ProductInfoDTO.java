@@ -33,6 +33,15 @@ public class ProductInfoDTO {
         this.stockLeft = stockLeft;
     }
 
+    public Integer getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Integer productId) {
+        this.productId = productId;
+    }
+
+    private Integer productId;
     private String name;
     private double cost;
     private String imageUrl;

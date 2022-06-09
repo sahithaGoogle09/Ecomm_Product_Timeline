@@ -32,7 +32,7 @@ public class ProductsService {
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
     public List<ProductInfoDTO> getProductsFromCloudBQ() {
-        String query = "Select item_description, cost_in_rs, imageUrl, stock_left from `"
+        String query = "Select item_description, cost_in_rs, imageUrl, stock_left, id from `"
                 + ApplicationConstants.PROJECT_ID
                 + "."
                 + ApplicationConstants.INPUT_DATASET_NAME
@@ -52,6 +52,7 @@ public class ProductsService {
             productInfoDTO.setCost(Double.parseDouble(row.get(1).getValue().toString()));
             productInfoDTO.setImageUrl(row.get(2).getValue().toString());
             productInfoDTO.setStockLeft(Integer.parseInt(row.get(3).getValue().toString()));
+            productInfoDTO.setProductId(Integer.parseInt(row.get(4).getValue().toString()));
             System.out.println("LOOOPPPP Inventory ");
             System.out.println(productInfoDTO.getName() + "??? " + productInfoDTO.getCost() + "??? " + productInfoDTO.getStockLeft());
             listOfProducts.add(productInfoDTO);
@@ -127,13 +128,15 @@ public class ProductsService {
             predictionsMap.get(productInfoDTO.getName()).stream().
                     filter(forecastInfo -> {
                         try {
-                            return forecastInfo.getDate().after(simpleDateFormat.parse("2022-04-27"));//replace with new date TODO
+                            return forecastInfo.getDate().after(simpleDateFormat.parse("2022-04-28"));//replace with new date TODO
                         } catch (ParseException e) {
                             throw new RuntimeException(e);
                         }
                     }).
                     sorted(Comparator.comparing(ForecastInfo::getDate)).forEach(forecastInfo -> {
                         System.out.println(forecastInfo.getDate() + "  " + forecastInfo.getItemDescription() + "   " + forecastInfo.getForecastValue());
+
+
                         if (productInfoDTO.getStockLeft() > ref.tempSum) {
                             System.out.println("Stock left" + productInfoDTO.getStockLeft());
                             System.out.println("Tempsum:" + ref.tempSum);
@@ -143,6 +146,12 @@ public class ProductsService {
                         }
 
                     });
+            if (productInfoDTO.getStockLeft() == 0) {
+                productInfoVO.setOutOfStock(true);
+            } else {
+                productInfoVO.setOutOfStock(false);
+            }
+            productInfoVO.setProductId(productInfoDTO.getProductId());
             productInfoVO.setProductName(productInfoDTO.getName());
             productInfoVO.setProductPrice(Double.parseDouble(df.format(productInfoDTO.getCost())));
             productInfoVO.setProductImage(productInfoDTO.getImageUrl());
@@ -194,5 +203,21 @@ public class ProductsService {
     public void insertInputForPredictionInBQ() {
         //run every 7 days
 
+    }
+
+    public void updateStockAfterBought(Integer productId, Integer unitsBought) {
+        List<ProductInfoDTO> productInfoDTOS = getProductsFromCloudBQ();
+        for (ProductInfoDTO productInfoDTO : productInfoDTOS) {
+            if (productId == productInfoDTO.getProductId()) {
+                Integer stockRemaining = productInfoDTO.getStockLeft() - unitsBought;
+                String query = "update `"
+                        + ApplicationConstants.PROJECT_ID
+                        + "."
+                        + ApplicationConstants.INPUT_DATASET_NAME
+                        + "."
+                        + ApplicationConstants.TABLE_NAME_PRODUCTS + "` set stock_left=" + stockRemaining + " where id=" + productId;
+                connectBQ.query(query);
+            }
+        }
     }
 }
